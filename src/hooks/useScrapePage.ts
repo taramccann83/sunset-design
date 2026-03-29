@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { supabase } from '../lib/supabase'
 
 export interface ScrapeResult {
   images: string[]
@@ -9,6 +8,9 @@ export interface ScrapeResult {
   currency: string | null
   storeName: string | null
 }
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 export function useScrapePage() {
   const [result, setResult] = useState<ScrapeResult | null>(null)
@@ -21,19 +23,25 @@ export function useScrapePage() {
     setResult(null)
 
     try {
-      const { data, error: fnError } = await supabase.functions.invoke('scrape-page', {
-        body: { url },
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/scrape-page`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ url }),
       })
 
-      if (fnError) {
-        setError(fnError.message || 'Scrape failed')
+      if (!res.ok) {
+        setError(`Scrape failed (${res.status})`)
         setLoading(false)
         return
       }
 
+      const data = await res.json()
+
       if (data?.error) {
         setError(data.error)
-        // Still set partial results if available
         if (data.images || data.ogImage) {
           setResult(data as ScrapeResult)
         }
