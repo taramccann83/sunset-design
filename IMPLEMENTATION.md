@@ -314,8 +314,9 @@ supabase/
 - [x] Responsive QA: mobile FAB repositioned, touch-friendly image editor, bottom nav spacing
 - [x] Performance: lazy route loading (code splitting), lazy image loading, reduced main bundle 851KB -> 233KB
 - [x] PWA icons and splash screen (192/512 icons, apple-touch-icon, manifest, service worker)
-- [x] Image editor: crop + rotate + zoom with aspect ratio presets (react-easy-crop)
-- [x] Mobile + button: floating action button (FAB) bottom-right, coral gradient
+- [x] Image editor: crop + rotate + zoom with aspect ratio presets (react-easy-crop), available in both ShareTarget and Mood Board upload flows, portal-rendered for mobile Safari
+- [x] Mobile + button: floating action button (FAB) bottom-right above nav, coral gradient
+- [x] Desktop + button: removed from nav rail (Chrome extension handles desktop pinning)
 - [ ] Final Netlify deploy from `main`
 - [ ] Set up custom domain (TBD)
 - [ ] Update `~/TOOLS.md` with Sunset Design entry
@@ -323,11 +324,12 @@ supabase/
 ### Phase 6 Files Added/Modified
 ```
 src/
-  components/ImageEditor.tsx   # Crop/rotate/zoom editor (react-easy-crop)
+  components/ImageEditor.tsx   # Crop/rotate/zoom editor (react-easy-crop), portal-rendered
+  components/InspoUploadDialog.tsx # Image editor added to mood board upload
   components/SkeletonCard.tsx  # Skeleton loading card (pin/board variants)
   components/Toast.tsx         # Toast notification system (context + provider)
   components/EmptyState.tsx    # SVG illustrations for empty views
-  layouts/AppLayout.tsx        # FAB repositioned, nav simplified
+  layouts/AppLayout.tsx        # FAB repositioned, desktop + removed, nav simplified
   pages/ShareTarget.tsx        # Image editor integration, toast notifications
   pages/Home.tsx               # Skeleton loading, staggered card animations
   pages/Rooms.tsx              # Skeleton loading, staggered animations

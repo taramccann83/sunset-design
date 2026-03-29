@@ -177,13 +177,17 @@ The app is a Progressive Web App. Users can install it on mobile and share URLs 
 
 ### Image Editor
 
-The ShareTarget page includes a crop/rotate/zoom editor (`ImageEditor.tsx`, powered by `react-easy-crop`). After selecting or uploading an image, an "Edit" button appears on the preview. The editor opens full-screen with:
+Crop/rotate/zoom editor (`ImageEditor.tsx`, powered by `react-easy-crop`) available in two upload flows:
+- **ShareTarget** (`/share`) — pin upload
+- **Mood Board** (`InspoUploadDialog.tsx`) — inspiration upload
+
+After selecting or uploading an image, an "Edit" button appears on the preview. The editor opens full-screen with:
 - Pinch-to-zoom and drag crop area
 - Aspect ratio presets: Free, 4:3, 1:1, 16:9
-- 90-degree rotation
+- 90-degree rotation with correct canvas transforms
 - Zoom slider
 
-When done, the cropped image replaces the original as a JPEG blob. Works on both desktop (mouse) and mobile (touch gestures).
+Rendered via `createPortal` to `document.body` (not inside scroll containers) for reliable mobile Safari behavior. Uses `touch-action: none` to prevent page scroll during crop. When done, the cropped image replaces the original as a JPEG blob.
 
 ### Toast Notifications
 
