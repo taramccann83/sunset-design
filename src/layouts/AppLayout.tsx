@@ -118,7 +118,7 @@ function MobileBottomNav() {
       {/* Floating Action Button */}
       <Link
         to="/share"
-        className="fixed bottom-13 right-5 z-51 flex h-14 w-14 items-center justify-center rounded-full gradient-primary text-white shadow-ambient-lg lg:hidden transition-transform duration-200 active:scale-95"
+        className="fixed bottom-22 right-5 z-51 flex h-14 w-14 items-center justify-center rounded-full gradient-primary text-white shadow-ambient-lg lg:hidden transition-transform duration-200 active:scale-95"
         aria-label="Add Pin"
       >
         {addPinIcon}
