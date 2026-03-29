@@ -153,7 +153,9 @@ The app is a Progressive Web App. Users can install it on mobile and share URLs 
 
 **Service Worker:** `public/sw.js` — handles share target POST interception, precaches app shell, network-first for API calls. Registered in `index.html` inline script.
 
-**Share Target flow:**
+**iOS limitation:** iOS does not support the Share Target API (not even for URLs). The primary mobile pin flow on iPhone is via the **+ button** in the nav bar, which opens `/share` for manual URL paste or camera roll upload.
+
+**Share Target flow (Android only):**
 1. OS shares URL/image to Sunset Design via `POST /share` (multipart/form-data)
 2. Service worker intercepts, reads FormData, stores in Cache API (`share-target-cache`)
 3. Redirects to `/share?source=share-target`
@@ -162,10 +164,14 @@ The app is a Progressive Web App. Users can install it on mobile and share URLs 
 
 **`/share` route** is outside `<AppLayout>` — standalone page with no nav rail/bottom bar. Still wrapped in `CurrencyProvider`.
 
+**+ button in nav:** Both desktop rail nav and mobile bottom nav have a "+" button linking to `/share`. On mobile it's a raised coral circle in the center of the bottom bar.
+
 **Three entry modes:**
 - URL share (from browser) — auto-scrapes metadata, shows OG image + "See more images"
 - Image share (from Photos/Instagram) — shows image preview, empty form
-- Direct navigation (fallback) — manual URL paste + image upload
+- Direct navigation / + button (primary iOS flow) — manual URL paste + camera roll upload
+
+**Scrape-blocked sites:** Many sites (Zara Home, etc.) block server-side scraping. When the Edge Function gets no images, the page shows a prominent "Upload from Camera Roll" button and filters out junk product names (e.g. "Service Unavailable"). The `useScrapePage` hook calls the Edge Function via direct `fetch` (not `supabase.functions.invoke`, which fails with `net::ERR_FAILED` on Vite 8 / Supabase SDK v2).
 
 **Icons:** `public/pwa-192x192.png`, `public/pwa-512x512.png`, `public/apple-touch-icon.png` — all from `~/Desktop/Icon 2.png`
 

@@ -271,8 +271,17 @@ extension/
   - Manual fallback: URL paste + image upload
 - [x] Add `/share` route outside `<AppLayout>` (standalone, no nav bars)
 - [x] Vite build passes (pre-existing TS errors in unrelated files; vite build succeeds)
-- [ ] Test PWA install on iOS Safari and Android Chrome
-- [ ] Test share target from mobile browser and Photos app
+- [x] Test PWA install on iOS Safari — confirmed working (Add to Home Screen)
+- [x] iOS Share Target limitation: iOS does not support Share Target API — added + button to nav as primary mobile pin flow
+- [x] Add + button to desktop rail nav and mobile bottom nav (raised coral circle, links to /share)
+- [x] Fix `supabase.functions.invoke` failing with `net::ERR_FAILED` — switched to direct `fetch`
+- [x] Improve scrape-blocked fallback UX: prominent "Upload from Camera Roll" button, junk product name filtering
+- [x] Playwright QA: all pages tested, scrape working (IKEA KALLAX), 0 console errors
+- [ ] Test share target from Android Chrome (requires Android device)
+
+**Known limitations:**
+- iOS: No share sheet integration. Use + button in nav to open /share, paste URL or upload image.
+- JS-rendered sites (Zara Home, etc.): Server-side scrape gets blocked. Fallback prompts camera roll upload.
 
 **File structure:**
 ```
@@ -285,9 +294,10 @@ public/
   _redirects               # Netlify SPA fallback
 netlify.toml               # Netlify headers (SW no-cache)
 src/
+  layouts/AppLayout.tsx    # + button added to both nav variants
   pages/ShareTarget.tsx    # Share target mini form page
   hooks/useShareTarget.ts  # Read shared data from SW cache
-  hooks/useScrapePage.ts   # Call scrape-page Edge Function
+  hooks/useScrapePage.ts   # Call scrape-page Edge Function (direct fetch)
 supabase/
   functions/scrape-page/index.ts  # Metadata scraping Edge Function
 ```
