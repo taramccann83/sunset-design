@@ -88,7 +88,11 @@ export default function ShareTarget() {
   useEffect(() => {
     if (!scrapeResult) return
     if (scrapeResult.ogImage) setSelectedImage(scrapeResult.ogImage)
-    if (scrapeResult.productName) setProductName(scrapeResult.productName)
+    // Filter out junk product names from blocked pages
+    const junkNames = ['service unavailable', 'access denied', 'just a moment', 'attention required', 'error', '403 forbidden', '404']
+    if (scrapeResult.productName && !junkNames.some((j) => scrapeResult.productName!.toLowerCase().includes(j))) {
+      setProductName(scrapeResult.productName)
+    }
     if (scrapeResult.storeName) setStoreName(scrapeResult.storeName)
     if (scrapeResult.price) setPrice(String(scrapeResult.price))
     if (scrapeResult.currency === 'EUR' || scrapeResult.currency === 'USD') {
@@ -323,16 +327,21 @@ export default function ShareTarget() {
 
         {/* No image found after scrape */}
         {!scraping && !selectedImage && sourceUrl && mode === 'url' && (
-          <div className="mb-4 p-4 bg-surface-container-lowest rounded-lg text-center">
-            <p className="text-sm text-on-surface-variant">
-              {scrapeError ? 'Could not reach that page.' : 'No product image found.'}
+          <div className="mb-4 p-6 bg-surface-container-lowest rounded-lg text-center">
+            <svg className="w-10 h-10 mx-auto text-on-surface-variant/40 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
+            </svg>
+            <p className="text-sm font-sans font-medium text-on-surface">
+              {scrapeError ? "This site blocked the image fetch" : "No product image found"}
             </p>
-            <p className="text-xs text-on-surface-variant mt-1">You can upload one instead.</p>
+            <p className="text-xs text-on-surface-variant mt-1 mb-4">
+              Save the image from the product page, then upload it here
+            </p>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="mt-3 text-sm text-primary-dark font-sans font-medium cursor-pointer"
+              className="w-full gradient-primary text-white font-sans font-semibold text-sm px-5 py-2.5 rounded-md cursor-pointer transition-opacity hover:opacity-90"
             >
-              Upload Image
+              Upload from Camera Roll
             </button>
             <input
               ref={fileInputRef}
