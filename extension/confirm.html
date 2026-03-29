@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=400">
+  <title>Pin to Sunset Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Noto+Serif:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="popup-container">
+    <header class="popup-header">
+      <h1>Pin to Sunset Design</h1>
+    </header>
+
+    <!-- Image preview -->
+    <div class="confirm-preview">
+      <img id="previewImage" alt="Selected image">
+    </div>
+
+    <!-- Metadata form -->
+    <div class="form-group">
+      <label for="boardSelect">Room</label>
+      <select id="boardSelect" class="input"></select>
+    </div>
+
+    <div class="form-group">
+      <label for="statusSelect">Status</label>
+      <select id="statusSelect" class="input">
+        <option value="wishlist" selected>Wishlist</option>
+        <option value="shortlisted">Shortlisted</option>
+        <option value="ordered">Ordered</option>
+        <option value="arrived">Arrived</option>
+        <option value="installed">Installed</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="productInput">Product name</label>
+      <input type="text" id="productInput" class="input" placeholder="Product name">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group flex-1">
+        <label for="priceInput">Price</label>
+        <input type="number" id="priceInput" class="input" placeholder="0.00" step="0.01">
+      </div>
+      <div class="form-group" style="width: 80px">
+        <label for="currencySelect">Currency</label>
+        <select id="currencySelect" class="input">
+          <option value="EUR" selected>EUR</option>
+          <option value="USD">USD</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="storeInput">Store</label>
+      <input type="text" id="storeInput" class="input" placeholder="Store name">
+    </div>
+
+    <div class="form-group">
+      <label for="tagsInput">Tags</label>
+      <div id="tagPills" class="tag-pills"></div>
+      <input type="text" id="tagsInput" class="input" placeholder="Add new tag and press Enter">
+    </div>
+
+    <div class="form-group">
+      <label for="notesInput">Notes</label>
+      <textarea id="notesInput" class="input textarea" placeholder="Optional notes"></textarea>
+    </div>
+
+    <label class="checkbox-row">
+      <input type="checkbox" id="vpnToggle">
+      <span>Requires VPN</span>
+    </label>
+
+    <div id="vpnNotice" class="vpn-notice" style="display:none">
+      A full-page screenshot will be captured for offline reference.
+    </div>
+
+    <button id="saveBtn" class="btn-primary">Save Pin</button>
+    <div id="savingState" class="saving-state" style="display:none">
+      <div class="spinner"></div>
+      <span>Saving...</span>
+    </div>
+    <div id="successState" class="success-state" style="display:none">
+      Pinned!
+    </div>
+    <div id="errorState" class="error-state" style="display:none"></div>
+  </div>
+
+  <script src="confirm.js"></script>
+</body>
+</html>

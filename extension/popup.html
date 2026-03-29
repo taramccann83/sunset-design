@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=400">
+  <title>Sunset Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Noto+Serif:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <h1>Sunset Design</h1>
+      <span class="page-url" id="pageUrl"></span>
+    </header>
+
+    <!-- Image Grid (Step 1) -->
+    <section id="imageGrid" class="section">
+      <div class="section-label">Select images to pin</div>
+      <div id="images" class="image-grid"></div>
+      <div id="noImages" class="empty-state" style="display:none">
+        No images found on this page
+      </div>
+      <button id="nextBtn" class="btn-primary" disabled>
+        Next <span id="selectedCount"></span>
+      </button>
+    </section>
+
+    <!-- Metadata Form (Step 2) -->
+    <section id="metaForm" class="section" style="display:none">
+      <button id="backBtn" class="btn-ghost">&larr; Back to images</button>
+
+      <div class="form-group">
+        <label for="boardSelect">Room</label>
+        <select id="boardSelect" class="input"></select>
+      </div>
+
+      <div class="form-group">
+        <label for="statusSelect">Status</label>
+        <select id="statusSelect" class="input">
+          <option value="wishlist" selected>Wishlist</option>
+          <option value="shortlisted">Shortlisted</option>
+          <option value="ordered">Ordered</option>
+          <option value="arrived">Arrived</option>
+          <option value="installed">Installed</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="tagsInput">Tags</label>
+        <div id="tagPills" class="tag-pills"></div>
+        <input type="text" id="tagsInput" class="input" placeholder="Add new tag and press Enter">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label for="priceInput">Price</label>
+          <input type="number" id="priceInput" class="input" placeholder="0.00" step="0.01">
+        </div>
+        <div class="form-group" style="width: 80px">
+          <label for="currencySelect">Currency</label>
+          <select id="currencySelect" class="input">
+            <option value="EUR" selected>EUR</option>
+            <option value="USD">USD</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="storeInput">Store</label>
+        <input type="text" id="storeInput" class="input" placeholder="Store name">
+      </div>
+
+      <div class="form-group">
+        <label for="productInput">Product name</label>
+        <input type="text" id="productInput" class="input" placeholder="Product name">
+      </div>
+
+      <div class="form-group">
+        <label for="notesInput">Notes</label>
+        <textarea id="notesInput" class="input textarea" placeholder="Optional notes"></textarea>
+      </div>
+
+      <label class="checkbox-row">
+        <input type="checkbox" id="vpnToggle">
+        <span>Requires VPN</span>
+      </label>
+
+      <div id="vpnNotice" class="vpn-notice" style="display:none">
+        A full-page screenshot will be captured for offline reference.
+      </div>
+
+      <button id="saveBtn" class="btn-primary">Save Pin</button>
+      <div id="savingState" class="saving-state" style="display:none">
+        <div class="spinner"></div>
+        <span>Saving...</span>
+      </div>
+      <div id="successState" class="success-state" style="display:none">
+        Pinned!
+      </div>
+      <div id="errorState" class="error-state" style="display:none"></div>
+    </section>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

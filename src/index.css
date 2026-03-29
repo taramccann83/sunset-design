@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  /* Colors: Algarve Twilight */
+  --color-primary: #FF7E5F;
+  --color-primary-dark: #a13920;
+  --color-primary-container: #fe7d5e;
+  --color-primary-on: #ffefec;
+  --color-secondary: #001F3F;
+  --color-tertiary: #D4AF37;
+  --color-surface: #f8f6f2;
+  --color-surface-container-low: #f3f1ec;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #edeae4;
+  --color-neutral: #FDFBF7;
+  --color-on-surface: #2e2f2d;
+  --color-on-surface-variant: #5b5c59;
+  --color-outline-variant: #aeadaa;
+
+  /* Status colors */
+  --color-status-success: #7a9a6d;
+  --color-status-warning: #D4AF37;
+  --color-status-error: #a13920;
+
+  /* Typography */
+  --font-serif: 'Noto Serif', Georgia, serif;
+  --font-sans: 'Manrope', system-ui, sans-serif;
+
+  /* Spacing scale */
+  --spacing-2: 0.5rem;
+  --spacing-4: 1rem;
+  --spacing-6: 2rem;
+  --spacing-8: 2.75rem;
+  --spacing-10: 3.5rem;
+  --spacing-12: 4rem;
+  --spacing-24: 6rem;
+
+  /* Ambient shadows (tinted, not pure black) */
+  --shadow-ambient: 0 8px 40px rgba(46, 47, 45, 0.05);
+  --shadow-ambient-lg: 0 12px 60px rgba(46, 47, 45, 0.06);
+  --shadow-card-hover: 0 12px 40px rgba(46, 47, 45, 0.08);
+
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 200ms ease-out;
+  --transition-normal: 300ms ease-in-out;
+  --transition-slow: 400ms ease-in-out;
+}
+
+/* Base styles */
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-on-surface);
+  background-color: var(--color-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-outline-variant);
+  border-radius: var(--radius-full);
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(248, 246, 242, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Primary gradient utility */
+.gradient-primary {
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary-container));
+}
+
+/* Ghost border utility */
+.border-ghost {
+  border: 1px solid rgba(174, 173, 170, 0.15);
+}
