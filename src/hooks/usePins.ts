@@ -52,7 +52,7 @@ export function usePins(filters: PinFilters = {}) {
         ...pin,
         tags: ((pin.pin_tags as { tag: string }[]) || []).map((t) => t.tag),
         pin_tags: undefined,
-      })) as Pin[]
+      })) as unknown as Pin[]
 
       if (filters.tag) {
         setPins(mapped.filter((p) => p.tags?.includes(filters.tag!)))

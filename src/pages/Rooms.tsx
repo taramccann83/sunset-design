@@ -6,6 +6,7 @@ import { useCurrency } from '../contexts/CurrencyContext'
 import { pinPriceInEur } from '../lib/format'
 import BoardCard from '../components/BoardCard'
 import MoodBoardCard from '../components/MoodBoardCard'
+import SkeletonCard from '../components/SkeletonCard'
 import type { Board } from '../types'
 
 export default function Rooms() {
@@ -17,7 +18,14 @@ export default function Rooms() {
 
   if (boardsLoading || pinsLoading || inspoLoading) {
     return (
-      <p className="font-sans text-on-surface-variant">Loading...</p>
+      <div className="max-w-6xl mx-auto px-4 lg:px-8 pt-4 lg:pt-8">
+        <div className="h-8 w-32 bg-surface-container-high animate-skeleton rounded mb-8" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <SkeletonCard key={i} type="board" />
+          ))}
+        </div>
+      </div>
     )
   }
 
@@ -44,7 +52,7 @@ export default function Rooms() {
       <div className="h-8" />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {boards.map((board) => {
+        {boards.map((board, i) => {
           const { pinCount, totalSpent, pinImages } = getBoardStats(board)
 
           return (
@@ -55,6 +63,7 @@ export default function Rooms() {
               totalSpent={totalSpent}
               pinImages={pinImages}
               onClick={handleBoardClick}
+              style={{ animationDelay: `${i * 50}ms` }}
             />
           )
         })}

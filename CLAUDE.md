@@ -164,7 +164,7 @@ The app is a Progressive Web App. Users can install it on mobile and share URLs 
 
 **`/share` route** is outside `<AppLayout>` — standalone page with no nav rail/bottom bar. Still wrapped in `CurrencyProvider`.
 
-**+ button in nav:** Both desktop rail nav and mobile bottom nav have a "+" button linking to `/share`. On mobile it's a raised coral circle in the center of the bottom bar.
+**+ button in nav:** Desktop rail nav has a "+" button linking to `/share` above the currency toggle. On mobile, the "+" is a floating action button (FAB) — coral gradient circle positioned bottom-right, above the nav bar.
 
 **Three entry modes:**
 - URL share (from browser) — auto-scrapes metadata, shows OG image + "See more images"
@@ -174,6 +174,33 @@ The app is a Progressive Web App. Users can install it on mobile and share URLs 
 **Scrape-blocked sites:** Many sites (Zara Home, etc.) block server-side scraping. When the Edge Function gets no images, the page shows a prominent "Upload from Camera Roll" button and filters out junk product names (e.g. "Service Unavailable"). The `useScrapePage` hook calls the Edge Function via direct `fetch` (not `supabase.functions.invoke`, which fails with `net::ERR_FAILED` on Vite 8 / Supabase SDK v2).
 
 **Icons:** `public/pwa-192x192.png`, `public/pwa-512x512.png`, `public/apple-touch-icon.png` — all from `~/Desktop/Icon 2.png`
+
+### Image Editor
+
+The ShareTarget page includes a crop/rotate/zoom editor (`ImageEditor.tsx`, powered by `react-easy-crop`). After selecting or uploading an image, an "Edit" button appears on the preview. The editor opens full-screen with:
+- Pinch-to-zoom and drag crop area
+- Aspect ratio presets: Free, 4:3, 1:1, 16:9
+- 90-degree rotation
+- Zoom slider
+
+When done, the cropped image replaces the original as a JPEG blob. Works on both desktop (mouse) and mobile (touch gestures).
+
+### Toast Notifications
+
+`ToastProvider` wraps the app in `App.tsx`. Use `useToast()` to show notifications:
+- `toast('message', 'success')` — sage green
+- `toast('message', 'error')` — deep terracotta
+- `toast('message', 'info')` — deep navy (default)
+
+Toasts auto-dismiss after 3 seconds with slide-up/slide-down animations. Positioned above mobile nav bar, bottom-center on desktop.
+
+### Animations & Loading States
+
+- **Card entrances:** `animate-fade-in-up` with staggered `animationDelay` per card index
+- **Skeleton loading:** `SkeletonCard` component with pulse animation, used on all pages during data fetch
+- **Empty states:** `EmptyState` component with SVG illustrations for pins, search, and budget empty views
+- **Route code splitting:** All pages lazy-loaded via `React.lazy()` + `Suspense`
+- **Lazy images:** `loading="lazy"` on PinCard, BoardCard, InspoCard images
 
 ### Supabase Edge Functions
 

@@ -6,6 +6,7 @@ import { useCurrency } from '../contexts/CurrencyContext'
 import { pinPriceInEur } from '../lib/format'
 import PinCard from '../components/PinCard'
 import BoardCard from '../components/BoardCard'
+import SkeletonCard from '../components/SkeletonCard'
 import Modal from '../components/Modal'
 import PinDetailView from '../components/PinDetailView'
 import type { Pin } from '../types'
@@ -47,8 +48,16 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <p className="font-sans text-on-surface-variant">Loading...</p>
+      <div>
+        <div className="w-full h-[50vh] bg-surface-container-high animate-skeleton" />
+        <div className="max-w-6xl mx-auto px-4 lg:px-8 mt-12">
+          <div className="h-6 w-40 bg-surface-container-high animate-skeleton rounded mb-6" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        </div>
       </div>
     )
   }
@@ -79,8 +88,8 @@ export default function Home() {
         <section className="mb-12">
           <h2 className="font-serif text-2xl font-semibold mb-6">Recent Pins</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {recentPins.map((pin) => (
-              <PinCard key={pin.id} pin={pin} onClick={handlePinClick} />
+            {recentPins.map((pin, i) => (
+              <PinCard key={pin.id} pin={pin} onClick={handlePinClick} style={{ animationDelay: `${i * 50}ms` }} />
             ))}
           </div>
         </section>
@@ -91,7 +100,7 @@ export default function Home() {
         <section className="mb-12">
           <h2 className="font-serif text-2xl font-semibold mb-6">Your Rooms</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {featuredBoards.map((board) => {
+            {featuredBoards.map((board, i) => {
               const stats = boardStats.get(board.id) || { pinCount: 0, totalSpent: 0, images: [] }
               return (
                 <BoardCard
@@ -101,6 +110,7 @@ export default function Home() {
                   totalSpent={stats.totalSpent}
                   pinImages={stats.images}
                   onClick={() => navigate(`/rooms/${board.slug}`)}
+                  style={{ animationDelay: `${i * 75}ms` }}
                 />
               )
             })}

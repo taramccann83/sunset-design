@@ -56,7 +56,7 @@ export default function BudgetDonut({ budgets, totalCommitted, masterBudget }: B
               ))}
             </Pie>
             <Tooltip
-              formatter={(value: number) => formatPrice(value)}
+              formatter={(value) => formatPrice(Number(value))}
               contentStyle={{
                 background: '#f8f6f2',
                 border: 'none',

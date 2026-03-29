@@ -5,6 +5,8 @@ import type { Pin, PinStatus } from '../types'
 import SearchInput from '../components/SearchInput'
 import StatusBadge from '../components/StatusBadge'
 import PinCard from '../components/PinCard'
+import SkeletonCard from '../components/SkeletonCard'
+import EmptyState from '../components/EmptyState'
 import Modal from '../components/Modal'
 import PinDetailView from '../components/PinDetailView'
 
@@ -139,27 +141,28 @@ export default function Search() {
 
       {/* Loading state */}
       {loading && (
-        <p className="font-sans text-sm text-on-surface-variant text-center py-12">
-          Loading...
-        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
       )}
 
       {/* Results grid */}
       {!loading && pins.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {pins.map((pin) => (
-            <PinCard key={pin.id} pin={pin} onClick={handlePinClick} />
+          {pins.map((pin, i) => (
+            <PinCard key={pin.id} pin={pin} onClick={handlePinClick} style={{ animationDelay: `${i * 50}ms` }} />
           ))}
         </div>
       )}
 
       {/* Empty state */}
       {!loading && pins.length === 0 && (
-        <div className="flex items-center justify-center py-24">
-          <p className="font-serif text-xl text-on-surface-variant">
-            No pins match your search
-          </p>
-        </div>
+        <EmptyState
+          type="search"
+          message="No pins match your search"
+        />
       )}
 
       {/* Pin Detail Modal */}

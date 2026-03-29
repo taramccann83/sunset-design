@@ -187,7 +187,7 @@ interface PinDetailViewProps {
   onDelete?: () => void
 }
 
-export default function PinDetailView({ pin, onClose, onUpdate, onDelete }: PinDetailViewProps) {
+export default function PinDetailView({ pin, onClose: _onClose, onUpdate, onDelete }: PinDetailViewProps) {
   const { updatePin, updatePinTags, deletePin } = usePinMutations()
   const { boards } = useBoards()
   const existingTags = useTags()

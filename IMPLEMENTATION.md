@@ -307,16 +307,37 @@ supabase/
 ## Phase 6: Polish + Launch
 **Goal:** Production-ready, delightful to use
 
-- [ ] Motion/transitions: fade-ins, card entrances, page transitions (per DESIGN.md)
-- [ ] Empty states: beautiful illustrations for boards with no pins yet
-- [ ] Loading states: skeleton cards matching Algarve Twilight palette
-- [ ] Error handling: warm-toned toast notifications
-- [ ] Responsive QA: test desktop, tablet, mobile
-- [ ] Performance: lazy load images, virtualize long pin lists
-- [ ] PWA icons and splash screen
+- [x] Motion/transitions: fade-in-up card entrances with staggered delays, scale-in modals, slide-up toasts
+- [x] Empty states: SVG illustrations (sunset frame, magnifying glass, coin) for pins, search, budget
+- [x] Loading states: skeleton cards with pulse animation matching Algarve Twilight palette
+- [x] Error handling: warm-toned toast notifications (success/error/info) with auto-dismiss
+- [x] Responsive QA: mobile FAB repositioned, touch-friendly image editor, bottom nav spacing
+- [x] Performance: lazy route loading (code splitting), lazy image loading, reduced main bundle 851KB -> 233KB
+- [x] PWA icons and splash screen (192/512 icons, apple-touch-icon, manifest, service worker)
+- [x] Image editor: crop + rotate + zoom with aspect ratio presets (react-easy-crop)
+- [x] Mobile + button: floating action button (FAB) bottom-right, coral gradient
 - [ ] Final Netlify deploy from `main`
 - [ ] Set up custom domain (TBD)
 - [ ] Update `~/TOOLS.md` with Sunset Design entry
+
+### Phase 6 Files Added/Modified
+```
+src/
+  components/ImageEditor.tsx   # Crop/rotate/zoom editor (react-easy-crop)
+  components/SkeletonCard.tsx  # Skeleton loading card (pin/board variants)
+  components/Toast.tsx         # Toast notification system (context + provider)
+  components/EmptyState.tsx    # SVG illustrations for empty views
+  layouts/AppLayout.tsx        # FAB repositioned, nav simplified
+  pages/ShareTarget.tsx        # Image editor integration, toast notifications
+  pages/Home.tsx               # Skeleton loading, staggered card animations
+  pages/Rooms.tsx              # Skeleton loading, staggered animations
+  pages/RoomDetail.tsx         # Skeleton loading, empty state, staggered animations
+  pages/Search.tsx             # Skeleton loading, empty state
+  pages/Budget.tsx             # Skeleton loading
+  pages/MoodBoard.tsx          # Skeleton loading
+  App.tsx                      # Lazy route loading, ToastProvider
+  index.css                    # Animation keyframes + utility classes
+```
 
 ---
 

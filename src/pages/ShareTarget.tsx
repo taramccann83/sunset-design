@@ -7,10 +7,13 @@ import { usePinMutations } from '../hooks/usePinMutations'
 import type { PinStatus, Currency } from '../types'
 import Button from '../components/Button'
 import Tag from '../components/Tag'
+import ImageEditor from '../components/ImageEditor'
+import { useToast } from '../components/Toast'
 
 type ShareMode = 'loading' | 'url' | 'image' | 'manual'
 
 export default function ShareTarget() {
+  const { toast } = useToast()
   const { data: shareData, loading: shareLoading } = useShareTarget()
   const { scrape, result: scrapeResult, loading: scraping, error: scrapeError } = useScrapePage()
   const { boards, loading: boardsLoading } = useBoards()
@@ -33,6 +36,10 @@ export default function ShareTarget() {
   const [currency, setCurrency] = useState<Currency>('EUR')
   const [notes, setNotes] = useState('')
   const [sourceUrl, setSourceUrl] = useState('')
+
+  // Image editor state
+  const [showEditor, setShowEditor] = useState(false)
+  const [editorSrc, setEditorSrc] = useState<string | null>(null)
 
   // Save state
   const [saving, setSaving] = useState(false)
@@ -149,6 +156,26 @@ export default function ShareTarget() {
     setSelectedImage(URL.createObjectURL(file))
   }
 
+  function openEditor() {
+    if (selectedImage) {
+      setEditorSrc(selectedImage)
+      setShowEditor(true)
+    }
+  }
+
+  function handleEditorDone(blob: Blob) {
+    const file = new File([blob], `edited-${Date.now()}.jpg`, { type: 'image/jpeg' })
+    setSharedFile(file)
+    setSelectedImage(URL.createObjectURL(file))
+    setShowEditor(false)
+    setEditorSrc(null)
+  }
+
+  function handleEditorCancel() {
+    setShowEditor(false)
+    setEditorSrc(null)
+  }
+
   async function handleSave() {
     if (!selectedImage && !sharedFile) return
     if (!boardId) return
@@ -170,6 +197,7 @@ export default function ShareTarget() {
           const file = new File([blob], `share-${Date.now()}.${ext}`, { type: blob.type })
           imageUrl = await uploadPinImage(file)
         } catch {
+          toast('Could not download the image. Try uploading from camera roll.', 'error')
           setSaveError('Could not download the image. Try saving it to your camera roll and sharing the file instead.')
           setSaving(false)
           return
@@ -196,11 +224,13 @@ export default function ShareTarget() {
       })
 
       if (!pin) {
+        toast('Failed to save pin', 'error')
         setSaveError('Failed to save pin. Please try again.')
         setSaving(false)
         return
       }
 
+      toast('Pin saved!', 'success')
       setSaved(true)
 
       setTimeout(() => {
@@ -353,15 +383,34 @@ export default function ShareTarget() {
           </div>
         )}
 
+        {/* Image editor overlay */}
+        {showEditor && editorSrc && (
+          <ImageEditor
+            imageSrc={editorSrc}
+            onDone={handleEditorDone}
+            onCancel={handleEditorCancel}
+          />
+        )}
+
         {/* Image preview */}
         {selectedImage && !scraping && (
           <div className="mb-4">
-            <div className="rounded-lg overflow-hidden bg-surface-container-lowest">
+            <div className="relative rounded-lg overflow-hidden bg-surface-container-lowest group">
               <img
                 src={selectedImage}
                 alt="Product preview"
                 className="w-full max-h-64 object-contain"
               />
+              <button
+                onClick={openEditor}
+                className="absolute bottom-2 right-2 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/80 backdrop-blur-sm text-white text-xs font-sans font-medium cursor-pointer transition-all hover:bg-secondary/90 opacity-80 group-hover:opacity-100"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 7h-1a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1" />
+                  <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415z" />
+                </svg>
+                Edit
+              </button>
             </div>
 
             {alternativeImages.length > 0 && (

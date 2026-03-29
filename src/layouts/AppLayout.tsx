@@ -122,75 +122,52 @@ function MobileBottomNav() {
   const location = useLocation()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl pb-2 shadow-ambient-lg bg-secondary lg:hidden">
-      <div className="flex items-center justify-around px-2 pt-2">
-        {navItems.slice(0, 2).map((item) => {
-          const isActive =
-            item.path === '/'
-              ? location.pathname === '/'
-              : location.pathname.startsWith(item.path)
+    <>
+      {/* Floating Action Button */}
+      <Link
+        to="/share"
+        className="fixed bottom-20 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full gradient-primary text-white shadow-ambient-lg lg:hidden transition-transform duration-200 active:scale-95"
+        aria-label="Add Pin"
+      >
+        {addPinIcon}
+      </Link>
 
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={`flex min-w-[3rem] flex-col items-center gap-0.5 rounded-xl px-3 py-2 transition-all duration-200 ease-out ${
-                isActive ? 'text-white' : 'text-white/90'
-              }`}
-              aria-label={item.label}
-            >
-              <span
-                className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-                  isActive ? 'gradient-primary text-white' : ''
-                }`}
-              >
-                {item.icon}
-              </span>
-              {isActive && (
-                <span className="font-sans text-xs font-semibold">
-                  {item.label}
-                </span>
-              )}
-            </NavLink>
-          )
-        })}
-        <Link
-          to="/share"
-          className="flex h-12 w-12 items-center justify-center rounded-full gradient-primary text-white -mt-4 shadow-lg"
-          aria-label="Add Pin"
-        >
-          {addPinIcon}
-        </Link>
-        {navItems.slice(2).map((item) => {
-          const isActive = location.pathname.startsWith(item.path)
+      <nav className="fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl pb-2 shadow-ambient-lg bg-secondary lg:hidden">
+        <div className="flex items-center justify-around px-2 pt-2">
+          {navItems.map((item) => {
+            const isActive =
+              item.path === '/'
+                ? location.pathname === '/'
+                : location.pathname.startsWith(item.path)
 
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={`flex min-w-[3rem] flex-col items-center gap-0.5 rounded-xl px-3 py-2 transition-all duration-200 ease-out ${
-                isActive ? 'text-white' : 'text-white/90'
-              }`}
-              aria-label={item.label}
-            >
-              <span
-                className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-                  isActive ? 'gradient-primary text-white' : ''
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={`flex min-w-[3rem] flex-col items-center gap-0.5 rounded-xl px-3 py-2 transition-all duration-200 ease-out ${
+                  isActive ? 'text-white' : 'text-white/90'
                 }`}
+                aria-label={item.label}
               >
-                {item.icon}
-              </span>
-              {isActive && (
-                <span className="font-sans text-xs font-semibold">
-                  {item.label}
+                <span
+                  className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+                    isActive ? 'gradient-primary text-white' : ''
+                  }`}
+                >
+                  {item.icon}
                 </span>
-              )}
-            </NavLink>
-          )
-        })}
-        <CurrencyToggle className="h-8 w-8 ml-1" />
-      </div>
-    </nav>
+                {isActive && (
+                  <span className="font-sans text-xs font-semibold">
+                    {item.label}
+                  </span>
+                )}
+              </NavLink>
+            )
+          })}
+          <CurrencyToggle className="h-8 w-8 ml-1" />
+        </div>
+      </nav>
+    </>
   )
 }
 

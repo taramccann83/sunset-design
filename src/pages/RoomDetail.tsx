@@ -6,6 +6,8 @@ import { useCurrency } from '../contexts/CurrencyContext'
 import { pinPriceInEur } from '../lib/format'
 import BudgetBar from '../components/BudgetBar'
 import PinCard from '../components/PinCard'
+import SkeletonCard from '../components/SkeletonCard'
+import EmptyState from '../components/EmptyState'
 import Tag from '../components/Tag'
 import Modal from '../components/Modal'
 import PinDetailView from '../components/PinDetailView'
@@ -40,7 +42,15 @@ export default function RoomDetail() {
 
   if (boardLoading || pinsLoading) {
     return (
-      <p className="font-sans text-on-surface-variant">Loading...</p>
+      <div className="max-w-6xl mx-auto px-4 lg:px-8 pt-4 lg:pt-8">
+        <div className="h-4 w-16 bg-surface-container-high animate-skeleton rounded mb-4" />
+        <div className="h-10 w-64 bg-surface-container-high animate-skeleton rounded mb-8" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      </div>
     )
   }
 
@@ -112,15 +122,18 @@ export default function RoomDetail() {
       )}
 
       {filteredPins.length === 0 ? (
-        <div className="flex items-center justify-center py-24">
-          <p className="font-serif text-xl text-on-surface-variant">
-            No pins yet
-          </p>
+        <div className="mt-8">
+          <EmptyState
+            type="pins"
+            message={selectedTag ? `No pins tagged "${selectedTag}"` : "No pins in this room yet"}
+            actionLabel="Add a Pin"
+            onAction={() => window.location.href = '/share'}
+          />
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
-          {filteredPins.map((pin) => (
-            <PinCard key={pin.id} pin={pin} onClick={handlePinClick} />
+          {filteredPins.map((pin, i) => (
+            <PinCard key={pin.id} pin={pin} onClick={handlePinClick} style={{ animationDelay: `${i * 50}ms` }} />
           ))}
         </div>
       )}

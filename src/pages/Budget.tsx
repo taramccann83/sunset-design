@@ -32,8 +32,17 @@ export default function Budget() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <p className="font-sans text-on-surface-variant">Loading...</p>
+      <div className="max-w-6xl mx-auto px-4 lg:px-8 pt-4 lg:pt-8">
+        <div className="h-10 w-56 bg-surface-container-high animate-skeleton rounded mb-4 mt-8" />
+        <div className="h-4 w-80 bg-surface-container-high animate-skeleton rounded mb-10" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          <div className="bg-surface-container-lowest rounded-xl p-6 h-64 animate-skeleton" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-surface-container-lowest rounded-xl p-5 h-20 animate-skeleton" style={{ animationDelay: `${i * 100}ms` }} />
+            ))}
+          </div>
+        </div>
       </div>
     )
   }
