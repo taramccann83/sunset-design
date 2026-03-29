@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import Cropper from 'react-easy-crop'
 import type { Area } from 'react-easy-crop'
 
@@ -15,31 +16,53 @@ const ASPECT_OPTIONS = [
   { label: '16:9', value: 16 / 9 },
 ] as const
 
-async function getCroppedImage(imageSrc: string, crop: Area): Promise<Blob> {
-  const image = new Image()
-  image.crossOrigin = 'anonymous'
-  await new Promise<void>((resolve, reject) => {
-    image.onload = () => resolve()
+function createImage(url: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const image = new Image()
+    // Only set crossOrigin for non-blob URLs
+    if (!url.startsWith('blob:')) {
+      image.crossOrigin = 'anonymous'
+    }
+    image.onload = () => resolve(image)
     image.onerror = reject
-    image.src = imageSrc
+    image.src = url
   })
+}
 
+function getRadianAngle(degreeValue: number) {
+  return (degreeValue * Math.PI) / 180
+}
+
+async function getCroppedImage(
+  imageSrc: string,
+  pixelCrop: Area,
+  rotation = 0,
+): Promise<Blob> {
+  const image = await createImage(imageSrc)
   const canvas = document.createElement('canvas')
-  canvas.width = crop.width
-  canvas.height = crop.height
   const ctx = canvas.getContext('2d')!
 
-  ctx.drawImage(
-    image,
-    crop.x,
-    crop.y,
-    crop.width,
-    crop.height,
-    0,
-    0,
-    crop.width,
-    crop.height,
-  )
+  const radians = getRadianAngle(rotation)
+  const sin = Math.abs(Math.sin(radians))
+  const cos = Math.abs(Math.cos(radians))
+
+  // Compute bounding box of the rotated source image
+  const rotW = image.width * cos + image.height * sin
+  const rotH = image.width * sin + image.height * cos
+
+  // Set canvas to the crop size
+  canvas.width = pixelCrop.width
+  canvas.height = pixelCrop.height
+
+  // Translate so we draw relative to the crop origin
+  ctx.translate(-pixelCrop.x, -pixelCrop.y)
+
+  // Move to the center of the rotated bounding box
+  ctx.translate(rotW / 2, rotH / 2)
+  ctx.rotate(radians)
+  ctx.translate(-image.width / 2, -image.height / 2)
+
+  ctx.drawImage(image, 0, 0)
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(
@@ -69,7 +92,7 @@ export default function ImageEditor({ imageSrc, onDone, onCancel }: ImageEditorP
     if (!croppedAreaPixels) return
     setProcessing(true)
     try {
-      const blob = await getCroppedImage(imageSrc, croppedAreaPixels)
+      const blob = await getCroppedImage(imageSrc, croppedAreaPixels, rotation)
       onDone(blob)
     } catch {
       setProcessing(false)
@@ -80,13 +103,15 @@ export default function ImageEditor({ imageSrc, onDone, onCancel }: ImageEditorP
     setRotation((r) => (r + 90) % 360)
   }
 
-  return (
-    <div className="fixed inset-0 z-50 bg-secondary flex flex-col">
+  // Use a portal so the editor renders at the document root,
+  // not inside a scrollable container (fixes mobile Safari)
+  return createPortal(
+    <div className="fixed inset-0 z-100 bg-secondary flex flex-col" style={{ touchAction: 'none' }}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-secondary">
+      <div className="flex items-center justify-between px-4 py-3 bg-secondary safe-area-top">
         <button
           onClick={onCancel}
-          className="text-white/80 hover:text-white text-sm font-sans font-medium cursor-pointer transition-colors"
+          className="text-white/80 hover:text-white text-sm font-sans font-medium cursor-pointer transition-colors min-h-[44px] min-w-[44px] flex items-center"
         >
           Cancel
         </button>
@@ -94,7 +119,7 @@ export default function ImageEditor({ imageSrc, onDone, onCancel }: ImageEditorP
         <button
           onClick={handleDone}
           disabled={processing}
-          className="text-primary font-sans font-semibold text-sm cursor-pointer transition-opacity disabled:opacity-40"
+          className="text-primary font-sans font-semibold text-sm cursor-pointer transition-opacity disabled:opacity-40 min-h-[44px] min-w-[44px] flex items-center justify-end"
         >
           {processing ? 'Saving...' : 'Done'}
         </button>
@@ -122,7 +147,7 @@ export default function ImageEditor({ imageSrc, onDone, onCancel }: ImageEditorP
       </div>
 
       {/* Controls */}
-      <div className="bg-secondary px-4 pt-3 pb-6 space-y-3">
+      <div className="bg-secondary px-4 pt-3 pb-6 space-y-3 safe-area-bottom">
         {/* Aspect ratio pills */}
         <div className="flex items-center justify-center gap-2">
           {ASPECT_OPTIONS.map((opt) => {
@@ -133,7 +158,7 @@ export default function ImageEditor({ imageSrc, onDone, onCancel }: ImageEditorP
               <button
                 key={opt.label}
                 onClick={() => setAspect(opt.value)}
-                className={`px-3 py-1.5 rounded-full text-xs font-sans font-medium cursor-pointer transition-all ${
+                className={`px-3 py-1.5 rounded-full text-xs font-sans font-medium cursor-pointer transition-all min-h-9 ${
                   isActive
                     ? 'gradient-primary text-white'
                     : 'bg-white/10 text-white/70 hover:bg-white/20'
@@ -145,7 +170,7 @@ export default function ImageEditor({ imageSrc, onDone, onCancel }: ImageEditorP
           })}
           <button
             onClick={handleRotate}
-            className="ml-2 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 cursor-pointer transition-all"
+            className="ml-2 w-9 h-9 flex items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 cursor-pointer transition-all"
             aria-label="Rotate 90 degrees"
             title="Rotate"
           >
@@ -180,6 +205,7 @@ export default function ImageEditor({ imageSrc, onDone, onCancel }: ImageEditorP
           </svg>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

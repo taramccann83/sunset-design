@@ -383,15 +383,6 @@ export default function ShareTarget() {
           </div>
         )}
 
-        {/* Image editor overlay */}
-        {showEditor && editorSrc && (
-          <ImageEditor
-            imageSrc={editorSrc}
-            onDone={handleEditorDone}
-            onCancel={handleEditorCancel}
-          />
-        )}
-
         {/* Image preview */}
         {selectedImage && !scraping && (
           <div className="mb-4">
@@ -403,7 +394,7 @@ export default function ShareTarget() {
               />
               <button
                 onClick={openEditor}
-                className="absolute bottom-2 right-2 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/80 backdrop-blur-sm text-white text-xs font-sans font-medium cursor-pointer transition-all hover:bg-secondary/90 opacity-80 group-hover:opacity-100"
+                className="absolute bottom-2 right-2 flex items-center gap-1.5 px-3 py-2 rounded-full bg-secondary/80 backdrop-blur-sm text-white text-xs font-sans font-medium cursor-pointer transition-all hover:bg-secondary/90 min-h-[44px]"
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M7 7h-1a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1" />
@@ -615,6 +606,15 @@ export default function ShareTarget() {
             {saving ? 'Saving...' : 'Save Pin'}
           </Button>
         </div>
+      )}
+
+      {/* Image editor — rendered outside scroll container via portal */}
+      {showEditor && editorSrc && (
+        <ImageEditor
+          imageSrc={editorSrc}
+          onDone={handleEditorDone}
+          onCancel={handleEditorCancel}
+        />
       )}
     </div>
   )
