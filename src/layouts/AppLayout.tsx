@@ -1,5 +1,12 @@
-import { Outlet, NavLink, useLocation } from 'react-router-dom'
+import { Outlet, NavLink, useLocation, Link } from 'react-router-dom'
 import { useCurrency } from '../contexts/CurrencyContext'
+
+const addPinIcon = (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+)
 
 const navItems = [
   {
@@ -98,6 +105,14 @@ function DesktopRailNav() {
           )
         })}
       </div>
+      <Link
+        to="/share"
+        className="flex h-10 w-10 items-center justify-center rounded-xl gradient-primary text-white mb-3 hover:opacity-90 transition-opacity"
+        aria-label="Add Pin"
+        title="Add Pin"
+      >
+        {addPinIcon}
+      </Link>
       <CurrencyToggle className="h-10 w-10 hover:bg-white/10 mb-2" />
     </nav>
   )
@@ -109,11 +124,45 @@ function MobileBottomNav() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl pb-2 shadow-ambient-lg bg-secondary lg:hidden">
       <div className="flex items-center justify-around px-2 pt-2">
-        {navItems.map((item) => {
+        {navItems.slice(0, 2).map((item) => {
           const isActive =
             item.path === '/'
               ? location.pathname === '/'
               : location.pathname.startsWith(item.path)
+
+          return (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={`flex min-w-[3rem] flex-col items-center gap-0.5 rounded-xl px-3 py-2 transition-all duration-200 ease-out ${
+                isActive ? 'text-white' : 'text-white/90'
+              }`}
+              aria-label={item.label}
+            >
+              <span
+                className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+                  isActive ? 'gradient-primary text-white' : ''
+                }`}
+              >
+                {item.icon}
+              </span>
+              {isActive && (
+                <span className="font-sans text-xs font-semibold">
+                  {item.label}
+                </span>
+              )}
+            </NavLink>
+          )
+        })}
+        <Link
+          to="/share"
+          className="flex h-12 w-12 items-center justify-center rounded-full gradient-primary text-white -mt-4 shadow-lg"
+          aria-label="Add Pin"
+        >
+          {addPinIcon}
+        </Link>
+        {navItems.slice(2).map((item) => {
+          const isActive = location.pathname.startsWith(item.path)
 
           return (
             <NavLink
