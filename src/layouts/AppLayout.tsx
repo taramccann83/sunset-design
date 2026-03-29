@@ -105,14 +105,6 @@ function DesktopRailNav() {
           )
         })}
       </div>
-      <Link
-        to="/share"
-        className="flex h-10 w-10 items-center justify-center rounded-xl gradient-primary text-white mb-3 hover:opacity-90 transition-opacity"
-        aria-label="Add Pin"
-        title="Add Pin"
-      >
-        {addPinIcon}
-      </Link>
       <CurrencyToggle className="h-10 w-10 hover:bg-white/10 mb-2" />
     </nav>
   )
