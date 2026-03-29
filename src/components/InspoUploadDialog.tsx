@@ -1,5 +1,6 @@
 import { useState, useRef, type DragEvent } from 'react'
 import Modal from './Modal'
+import ImageEditor from './ImageEditor'
 import { useInspoMutations } from '../hooks/useInspoMutations'
 import { supabase } from '../lib/supabase'
 
@@ -30,6 +31,10 @@ export default function InspoUploadDialog({ isOpen, onClose, onAdded }: InspoUpl
 
   const [saving, setSaving] = useState(false)
 
+  // Image editor state
+  const [showEditor, setShowEditor] = useState(false)
+  const [editorSrc, setEditorSrc] = useState<string | null>(null)
+
   const { createInspoImage, uploadInspoImage } = useInspoMutations()
 
   function reset() {
@@ -43,6 +48,8 @@ export default function InspoUploadDialog({ isOpen, onClose, onAdded }: InspoUpl
     setPreview(null)
     setDragging(false)
     setSaving(false)
+    setShowEditor(false)
+    setEditorSrc(null)
     setMode('browse')
   }
 
@@ -125,6 +132,26 @@ export default function InspoUploadDialog({ isOpen, onClose, onAdded }: InspoUpl
   function handleFileSelect(f: File) {
     setFile(f)
     setPreview(URL.createObjectURL(f))
+  }
+
+  function openEditor() {
+    if (preview) {
+      setEditorSrc(preview)
+      setShowEditor(true)
+    }
+  }
+
+  function handleEditorDone(blob: Blob) {
+    const editedFile = new File([blob], `edited-${Date.now()}.jpg`, { type: 'image/jpeg' })
+    setFile(editedFile)
+    setPreview(URL.createObjectURL(editedFile))
+    setShowEditor(false)
+    setEditorSrc(null)
+  }
+
+  function handleEditorCancel() {
+    setShowEditor(false)
+    setEditorSrc(null)
   }
 
   function handleDrop(e: DragEvent) {
@@ -279,9 +306,23 @@ export default function InspoUploadDialog({ isOpen, onClose, onAdded }: InspoUpl
                 <button
                   type="button"
                   onClick={() => { setFile(null); setPreview(null) }}
-                  className="absolute top-2 right-2 bg-black/50 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs cursor-pointer hover:bg-black/70"
+                  className="absolute top-2 right-2 bg-black/50 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs cursor-pointer hover:bg-black/70 min-h-11 min-w-11"
+                  aria-label="Remove image"
                 >
-                  x
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  onClick={openEditor}
+                  className="absolute bottom-2 right-2 flex items-center gap-1.5 px-3 py-2 rounded-full bg-secondary/80 backdrop-blur-sm text-white text-xs font-sans font-medium cursor-pointer transition-all hover:bg-secondary/90 min-h-11"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M7 7h-1a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1" />
+                    <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415z" />
+                  </svg>
+                  Edit
                 </button>
               </div>
             ) : (
@@ -322,6 +363,15 @@ export default function InspoUploadDialog({ isOpen, onClose, onAdded }: InspoUpl
             {saving ? 'Uploading...' : 'Add to Mood Board'}
           </button>
         </>
+      )}
+
+      {/* Image editor — rendered via portal */}
+      {showEditor && editorSrc && (
+        <ImageEditor
+          imageSrc={editorSrc}
+          onDone={handleEditorDone}
+          onCancel={handleEditorCancel}
+        />
       )}
     </Modal>
   )
