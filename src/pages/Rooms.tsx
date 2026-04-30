@@ -1,22 +1,19 @@
 import { useNavigate } from 'react-router-dom'
 import { useBoards } from '../hooks/useBoards'
 import { usePins } from '../hooks/usePins'
-import { useInspoImages } from '../hooks/useInspoImages'
 import { useCurrency } from '../contexts/CurrencyContext'
 import { pinPriceInEur } from '../lib/format'
 import BoardCard from '../components/BoardCard'
-import MoodBoardCard from '../components/MoodBoardCard'
 import SkeletonCard from '../components/SkeletonCard'
 import type { Board } from '../types'
 
 export default function Rooms() {
   const { boards, loading: boardsLoading } = useBoards()
   const { pins, loading: pinsLoading } = usePins()
-  const { images: inspoImages, loading: inspoLoading } = useInspoImages()
   const { liveRate } = useCurrency()
   const navigate = useNavigate()
 
-  if (boardsLoading || pinsLoading || inspoLoading) {
+  if (boardsLoading || pinsLoading) {
     return (
       <div className="max-w-6xl mx-auto px-4 lg:px-8 pt-4 lg:pt-8">
         <div className="h-8 w-32 bg-surface-container-high animate-skeleton rounded mb-8" />
@@ -67,11 +64,6 @@ export default function Rooms() {
             />
           )
         })}
-        <MoodBoardCard
-          imageCount={inspoImages.length}
-          previewImages={inspoImages.slice(0, 4).map((img) => img.image_url)}
-          onClick={() => navigate('/mood-board')}
-        />
       </div>
     </div>
   )

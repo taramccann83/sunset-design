@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useShareTarget } from '../hooks/useShareTarget'
 import { useScrapePage } from '../hooks/useScrapePage'
 import { useBoards } from '../hooks/useBoards'
@@ -8,6 +8,7 @@ import type { PinStatus, Currency } from '../types'
 import Button from '../components/Button'
 import Tag from '../components/Tag'
 import ImageEditor from '../components/ImageEditor'
+import ImagePicker from '../components/ImagePicker'
 import { useToast } from '../components/Toast'
 
 type ShareMode = 'loading' | 'url' | 'image' | 'manual'
@@ -23,7 +24,7 @@ export default function ShareTarget() {
   const [mode, setMode] = useState<ShareMode>('loading')
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [sharedFile, setSharedFile] = useState<File | null>(null)
-  const [showMoreImages, setShowMoreImages] = useState(false)
+  const [showPicker, setShowPicker] = useState(false)
 
   // Form state
   const [boardId, setBoardId] = useState('')
@@ -94,7 +95,15 @@ export default function ShareTarget() {
   // Pre-fill form from scrape results
   useEffect(() => {
     if (!scrapeResult) return
-    if (scrapeResult.ogImage) setSelectedImage(scrapeResult.ogImage)
+    // Picker-first: if multiple images, open picker instead of auto-selecting.
+    // If only one image, auto-select it. If zero, leave the existing fallback UI.
+    if (scrapeResult.images.length >= 2) {
+      setShowPicker(true)
+    } else if (scrapeResult.images.length === 1) {
+      setSelectedImage(scrapeResult.images[0])
+    } else if (scrapeResult.ogImage) {
+      setSelectedImage(scrapeResult.ogImage)
+    }
     // Filter out junk product names from blocked pages
     const junkNames = ['service unavailable', 'access denied', 'just a moment', 'attention required', 'error', '403 forbidden', '404']
     if (scrapeResult.productName && !junkNames.some((j) => scrapeResult.productName!.toLowerCase().includes(j))) {
@@ -111,11 +120,6 @@ export default function ShareTarget() {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 })
   }, [mode, selectedImage])
-
-  const alternativeImages = useMemo(
-    () => scrapeResult?.images?.filter((img) => img !== selectedImage) || [],
-    [scrapeResult?.images, selectedImage]
-  )
 
   function toggleTag(tag: string) {
     setSelectedTags((prev) => {
@@ -174,6 +178,18 @@ export default function ShareTarget() {
   function handleEditorCancel() {
     setShowEditor(false)
     setEditorSrc(null)
+  }
+
+  function handlePickerSelect(imageUrl: string) {
+    setSelectedImage(imageUrl)
+    setSharedFile(null)
+    setShowPicker(false)
+  }
+
+  function handlePickerUpload(file: File) {
+    setSharedFile(file)
+    setSelectedImage(URL.createObjectURL(file))
+    setShowPicker(false)
   }
 
   async function handleSave() {
@@ -392,46 +408,30 @@ export default function ShareTarget() {
                 alt="Product preview"
                 className="w-full max-h-64 object-contain"
               />
-              <button
-                onClick={openEditor}
-                className="absolute bottom-2 right-2 flex items-center gap-1.5 px-3 py-2 rounded-full bg-secondary/80 backdrop-blur-sm text-white text-xs font-sans font-medium cursor-pointer transition-all hover:bg-secondary/90 min-h-[44px]"
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M7 7h-1a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1" />
-                  <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415z" />
-                </svg>
-                Edit
-              </button>
-            </div>
-
-            {alternativeImages.length > 0 && (
-              <button
-                onClick={() => setShowMoreImages(!showMoreImages)}
-                className="mt-2 text-sm text-primary-dark font-sans font-medium cursor-pointer"
-              >
-                {showMoreImages ? 'Hide images' : `See ${alternativeImages.length} more images`}
-              </button>
-            )}
-
-            {showMoreImages && (
-              <div className="grid grid-cols-3 gap-2 mt-2">
-                {alternativeImages.map((img) => (
-                  <button
-                    key={img}
-                    onClick={() => {
-                      setSelectedImage(img)
-                      setSharedFile(null)
-                      setShowMoreImages(false)
-                    }}
-                    className={`aspect-square rounded-md overflow-hidden border-2 transition-colors cursor-pointer ${
-                      selectedImage === img ? 'border-primary' : 'border-transparent'
-                    }`}
-                  >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
+              <div className="absolute bottom-2 right-2 flex items-center gap-2">
+                <button
+                  onClick={() => setShowPicker(true)}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-secondary/80 backdrop-blur-sm text-white text-xs font-sans font-medium cursor-pointer transition-all hover:bg-secondary/90 min-h-[44px]"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                  Replace
+                </button>
+                <button
+                  onClick={openEditor}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-secondary/80 backdrop-blur-sm text-white text-xs font-sans font-medium cursor-pointer transition-all hover:bg-secondary/90 min-h-[44px]"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M7 7h-1a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1" />
+                    <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415z" />
+                  </svg>
+                  Edit
+                </button>
               </div>
-            )}
+            </div>
           </div>
         )}
 
@@ -614,6 +614,17 @@ export default function ShareTarget() {
           imageSrc={editorSrc}
           onDone={handleEditorDone}
           onCancel={handleEditorCancel}
+        />
+      )}
+
+      {/* Image picker — rendered outside scroll container via portal */}
+      {showPicker && (
+        <ImagePicker
+          images={scrapeResult?.images || []}
+          selectedImage={selectedImage}
+          onSelect={handlePickerSelect}
+          onUpload={handlePickerUpload}
+          onClose={() => setShowPicker(false)}
         />
       )}
     </div>

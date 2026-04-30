@@ -6,6 +6,7 @@ import { useBoards } from '../hooks/useBoards'
 import { useTags } from '../hooks/useTags'
 import VpnBadge from './VpnBadge'
 import Tag from './Tag'
+import ImageEditor from './ImageEditor'
 
 const ALL_STATUSES: PinStatus[] = [
   'wishlist',
@@ -188,7 +189,7 @@ interface PinDetailViewProps {
 }
 
 export default function PinDetailView({ pin, onClose: _onClose, onUpdate, onDelete }: PinDetailViewProps) {
-  const { updatePin, updatePinTags, deletePin } = usePinMutations()
+  const { updatePin, updatePinTags, deletePin, uploadPinImage } = usePinMutations()
   const { boards } = useBoards()
   const existingTags = useTags()
   const { formatPinPrice, liveRate } = useCurrency()
@@ -197,6 +198,12 @@ export default function PinDetailView({ pin, onClose: _onClose, onUpdate, onDele
   const [saving, setSaving] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [currentStatus, setCurrentStatus] = useState<PinStatus>(pin.status)
+
+  // Image editing state
+  const [currentImageUrl, setCurrentImageUrl] = useState(pin.image_url)
+  const [photoBusy, setPhotoBusy] = useState(false)
+  const [photoEditorSrc, setPhotoEditorSrc] = useState<string | null>(null)
+  const photoInputRef = useRef<HTMLInputElement>(null)
 
   // Editable fields
   const [productName, setProductName] = useState(pin.product_name ?? '')
@@ -276,6 +283,36 @@ export default function PinDetailView({ pin, onClose: _onClose, onUpdate, onDele
     }
   }
 
+  async function applyNewImage(file: File) {
+    setPhotoBusy(true)
+    const newUrl = await uploadPinImage(file)
+    if (newUrl) {
+      const success = await updatePin(pin.id, { image_url: newUrl })
+      if (success) setCurrentImageUrl(newUrl)
+    }
+    setPhotoBusy(false)
+  }
+
+  function handleReplaceClick() {
+    photoInputRef.current?.click()
+  }
+
+  async function handleReplaceFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (file) await applyNewImage(file)
+  }
+
+  function handleEditPhoto() {
+    setPhotoEditorSrc(currentImageUrl)
+  }
+
+  async function handlePhotoEditorDone(blob: Blob) {
+    const file = new File([blob], `pin-${pin.id}-${Date.now()}.jpg`, { type: 'image/jpeg' })
+    setPhotoEditorSrc(null)
+    await applyNewImage(file)
+  }
+
   function handleCancelEdit() {
     setProductName(pin.product_name ?? '')
     setStoreName(pin.store_name ?? '')
@@ -322,7 +359,7 @@ export default function PinDetailView({ pin, onClose: _onClose, onUpdate, onDele
       <div>
         <div className="relative">
           <img
-            src={pin.image_url}
+            src={currentImageUrl}
             alt={pin.product_name ?? 'Pin image'}
             className="w-full rounded-lg"
           />
@@ -473,11 +510,58 @@ export default function PinDetailView({ pin, onClose: _onClose, onUpdate, onDele
     <div>
       <div className="relative">
         <img
-          src={pin.image_url}
+          src={currentImageUrl}
           alt={productName || 'Pin image'}
           className="w-full rounded-lg"
         />
+        {photoBusy && (
+          <div className="absolute inset-0 flex items-center justify-center bg-secondary/40 rounded-lg">
+            <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
+        <div className="absolute bottom-2 right-2 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleReplaceClick}
+            disabled={photoBusy}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-secondary/80 backdrop-blur-sm text-white text-xs font-sans font-medium cursor-pointer transition-all hover:bg-secondary/90 disabled:opacity-50 min-h-[44px]"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            Replace
+          </button>
+          <button
+            type="button"
+            onClick={handleEditPhoto}
+            disabled={photoBusy}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-secondary/80 backdrop-blur-sm text-white text-xs font-sans font-medium cursor-pointer transition-all hover:bg-secondary/90 disabled:opacity-50 min-h-[44px]"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M7 7h-1a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1" />
+              <path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97L9 12v3h3l8.385-8.415z" />
+            </svg>
+            Edit
+          </button>
+        </div>
+        <input
+          ref={photoInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleReplaceFile}
+        />
       </div>
+
+      {photoEditorSrc && (
+        <ImageEditor
+          imageSrc={photoEditorSrc}
+          onDone={handlePhotoEditorDone}
+          onCancel={() => setPhotoEditorSrc(null)}
+        />
+      )}
 
       <div className="p-4 space-y-4">
         <div>

@@ -26,6 +26,7 @@ interface UpdatePinInput {
   board_id?: string
   requires_vpn?: boolean
   dimensions?: { w: number | null; h: number | null; d: number | null; unit: string } | null
+  image_url?: string
 }
 
 export function usePinMutations() {

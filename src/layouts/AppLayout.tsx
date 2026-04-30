@@ -32,12 +32,14 @@ const navItems = [
     ),
   },
   {
-    label: 'Search',
-    path: '/search',
+    label: 'Mood Board',
+    path: '/mood-board',
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="11" cy="11" r="8" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        <rect x="3" y="3" width="8" height="10" rx="1" />
+        <rect x="13" y="3" width="8" height="6" rx="1" />
+        <rect x="3" y="15" width="8" height="6" rx="1" />
+        <rect x="13" y="11" width="8" height="10" rx="1" />
       </svg>
     ),
   },

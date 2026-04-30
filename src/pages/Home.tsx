@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useBoards } from '../hooks/useBoards'
 import { usePins } from '../hooks/usePins'
 import { useCurrency } from '../contexts/CurrencyContext'
@@ -79,6 +79,17 @@ export default function Home() {
             Sunset Condo Design
           </h1>
         </div>
+        <Link
+          to="/search"
+          aria-label="Search"
+          className="absolute top-4 right-4 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-black/20 backdrop-blur-sm text-white transition-all duration-200 hover:bg-black/30 active:scale-95"
+          style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))' }}
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </Link>
       </div>
 
     <div className="max-w-6xl mx-auto px-4 lg:px-8">
